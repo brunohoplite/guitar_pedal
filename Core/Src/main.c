@@ -27,10 +27,9 @@
 #include "rotary_encoder.h"
 #include <math.h>
 #include <stdbool.h>
-#include "delay.h"
-#include "distortion.h"
 #include "user_menu.h"
 #include "signal_generator.h"
+#include "pedal_output.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -40,6 +39,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -57,14 +57,7 @@ TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim6;
 
 /* USER CODE BEGIN PV */
-Lcd_PortType ports[] = {
-		LCD_D4_GPIO_Port, LCD_D5_GPIO_Port, LCD_D6_GPIO_Port, LCD_D7_GPIO_Port
-};
 
-Lcd_PinType pins[] = {LCD_D4_Pin, LCD_D5_Pin, LCD_D6_Pin, LCD_D7_Pin};
-
-Lcd_HandleTypeDef lcd;
-uint32_t guitarSignal;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -81,73 +74,27 @@ static void MX_TIM6_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-float lastFilteredValue = 0, filteredValue = 0;
-const float alpha = 0.001f;
-uint32_t out;
-bool distortionOut = false;
-unsigned count = 0;
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
 	if(hadc == &hadc1)
-	{
-		guitarSignal = HAL_ADC_GetValue(hadc);
-		guitarSignal = (guitarSignal * 4095) / 1023;
-		filteredValue = lastFilteredValue + alpha * (guitarSignal - lastFilteredValue);
-		lastFilteredValue = filteredValue;
-
-//		unsigned diff;
-//
-//		if(guitarSignal > filteredValue)
-//			diff = guitarSignal - filteredValue;
-//		else
-//			diff = filteredValue - guitarSignal;
-
-		if(0)
-			out = 2047;
-		else
-		{
-			Menu currentMenu = getCurrentMenu();
-
-			switch(currentMenu) {
-
-			case  MENU_CLEAN:
-				out = guitarSignal;
-				break;
-
-			case  MENU_DELAY:
-				out = delay(guitarSignal, filteredValue);
-				break;
-
-			case  MENU_DISTORTION:
-				out = distortion(guitarSignal, filteredValue);
-				break;
-
-			case MENU_START:
-			case MENU_END:
-			default:
-				break;
-			}
-		}
-		HAL_DAC_SetValue(&hdac, DAC_CHANNEL_1, DAC_ALIGN_12B_R, out);
-
-		if(++count >= 1000)
-		{
-			HAL_GPIO_TogglePin(test_GPIO_Port, test_Pin);
-			count = 0;
-		}
-	}
+		pedalOutputTask(hadc, &hdac);
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	if(GPIO_Pin == ROTARY_SW_Pin)
-	{
 		HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-		gainUp();
-		distortionOut ^= true;
-	}
 	else if(GPIO_Pin == ROTARY_A_Pin)
 		rotartEncoderIsr();
+}
+
+static void setInitialState(void)
+{
+	rotaryEncoderInit(ROTARY_A_GPIO_Port, ROTARY_A_Pin, ROTARY_B_GPIO_Port, ROTARY_B_Pin, ROTARY_SW_GPIO_Port, ROTARY_SW_Pin, incrementMenu, decrementMenu);
+
+	HAL_ADC_Start_IT(&hadc1);
+	HAL_TIM_Base_Start(&htim2);
+	HAL_DAC_Start(&hdac, DAC_CHANNEL_1);
 }
 /* USER CODE END 0 */
 
@@ -186,21 +133,8 @@ int main(void)
   MX_TIM2_Init();
   MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
-  lcd = Lcd_create(ports, pins, LCD_RS_GPIO_Port, LCD_RS_Pin, LCD_E_GPIO_Port, LCD_E_Pin, LCD_4_BIT_MODE);
-  rotaryEncoderInit(ROTARY_A_GPIO_Port, ROTARY_A_Pin, ROTARY_B_GPIO_Port, ROTARY_B_Pin, ROTARY_SW_GPIO_Port, ROTARY_SW_Pin, incrementMenu, decrementMenu);
-  Lcd_string(&lcd, "STM32 Effects!");
-  HAL_Delay(1000);
   initMenu();
-#if 1
-  HAL_ADC_Start_IT(&hadc1);
-  HAL_TIM_Base_Start(&htim2);
-  HAL_DAC_Start(&hdac, DAC_CHANNEL_1);
-#else
-  HAL_DAC_Start_DMA(&hdac, DAC_CHANNEL_1, (uint32_t*)sineWaveLut, numSamples, DAC_ALIGN_12B_R);
-  HAL_TIM_Base_Start(&htim6);
-  signalGeneratorInit(&htim6);
-  signalGeneratorPlayNote(A_4);
-#endif
+  setInitialState();
   /* USER CODE END 2 */
  
  

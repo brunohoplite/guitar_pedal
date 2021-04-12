@@ -7,29 +7,26 @@
 #include <math.h>
 #include "distortion.h"
 
-int32_t clippingP = 75, clippingN = -75, gain = 1;
+float gain = 15;
 
 uint32_t distortion(uint32_t guitarOut, uint32_t dcBias)
 {
 	float out = (float)guitarOut - (float)dcBias;
-#if 0
-	if(out >= clippingP)
-		out = clippingP;
-	else if(out <= clippingN)
-		out = clippingN;
-	return out;
-#else
-	out /= 4095.f;
-	float sign = out < 0 ? -1 : 1;
-	if(out > 0)
-		out *= -1.f * gain;
+
+	out /= 186.f;
+	float sign;
+	if(out < 0)
+		sign = -1.f;
 	else
-		out *= gain;
-	float distorted = 1 - exp(out * gain);
+	{
+		sign = 1;
+		out *= -1.f;
+	}
+	out *= gain;
+	float distorted = 1 - exp(out);
 	distorted *= sign;
 
-	return (uint32_t)((distorted / gain) * 4096.f)+ dcBias;
-#endif
+	return (uint32_t)((distorted) * 186.f)+ dcBias;
 }
 
 void gainUp(void)

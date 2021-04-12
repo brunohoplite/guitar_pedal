@@ -8,9 +8,16 @@
 #include "user_menu.h"
 #include "lcd.h"
 
+Lcd_PortType ports[] = {
+		LCD_D4_GPIO_Port, LCD_D5_GPIO_Port, LCD_D6_GPIO_Port, LCD_D7_GPIO_Port
+};
+
+Lcd_PinType pins[] = {LCD_D4_Pin, LCD_D5_Pin, LCD_D6_Pin, LCD_D7_Pin};
+
+Lcd_HandleTypeDef lcd;
+
 Menu currentMenu = MENU_CLEAN;
 char menuClean[16] = "Clean", menuDelay[16] = "Delay", menuDistortion[16] = "Distortion";
-extern Lcd_HandleTypeDef lcd;
 
 static void displayMenu(void)
 {
@@ -43,6 +50,9 @@ static void displayMenu(void)
 
 void initMenu(void)
 {
+	lcd = Lcd_create(ports, pins, LCD_RS_GPIO_Port, LCD_RS_Pin, LCD_E_GPIO_Port, LCD_E_Pin, LCD_4_BIT_MODE);
+	Lcd_string(&lcd, "STM32 Effects!");
+	HAL_Delay(1000);
 	displayMenu();
 }
 
