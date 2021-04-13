@@ -20,6 +20,7 @@ typedef enum {
 void initMenu(void);
 void incrementMenu(void);
 void decrementMenu(void);
+void toggleMenuEdit(void);
 Menu getCurrentMenu(void);
 
 #endif /* INC_USER_MENU_H_ */

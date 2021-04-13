@@ -11,6 +11,7 @@
 #include "main.h"
 
 uint32_t distortion(uint32_t guitarOut, uint32_t dcBias);
-void gainUp(void);
+const unsigned getDistortionGainValue(void);
+unsigned* getDistortionGain(void);
 
 #endif /* INC_DISTORTION_H_ */

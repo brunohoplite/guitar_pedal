@@ -7,7 +7,7 @@
 #include <math.h>
 #include "distortion.h"
 
-float gain = 15;
+unsigned gain = 10;
 
 uint32_t distortion(uint32_t guitarOut, uint32_t dcBias)
 {
@@ -22,14 +22,19 @@ uint32_t distortion(uint32_t guitarOut, uint32_t dcBias)
 		sign = 1;
 		out *= -1.f;
 	}
-	out *= gain;
+	out *= (float)gain;
 	float distorted = 1 - exp(out);
 	distorted *= sign;
 
 	return (uint32_t)((distorted) * 186.f)+ dcBias;
 }
 
-void gainUp(void)
+const unsigned getDistortionGainValue(void)
 {
-	gain++;
+	return gain;
+}
+
+unsigned* getDistortionGain(void)
+{
+	return &gain;
 }

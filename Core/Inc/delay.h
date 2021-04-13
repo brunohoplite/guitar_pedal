@@ -11,5 +11,7 @@
 #include "main.h"
 
 uint32_t delay(uint32_t guitarOut, uint32_t dcBias);
+const signed getDelayLevelValue(void);
+signed* getDelayLevel(void);
 
 #endif /* INC_DELAY_H_ */
