@@ -10,6 +10,7 @@
 #include "user_menu.h"
 #include "delay.h"
 #include "distortion.h"
+#include "clean.h"
 
 #define RMS_SAMPLES		100
 
@@ -55,7 +56,7 @@ static void processSelectedEffect(void)
 	switch(currentMenu) {
 
 	case  MENU_CLEAN:
-		pedal.out = pedal.guitarSignal;
+		pedal.out = clean(pedal.guitarSignal, pedal.filteredValue);
 		break;
 
 	case  MENU_DELAY:

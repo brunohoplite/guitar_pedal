@@ -8,6 +8,8 @@
 #ifndef INC_USER_MENU_H_
 #define INC_USER_MENU_H_
 
+#include "lcd.h"
+
 typedef enum {
 	MENU_START = 0,
 	MENU_CLEAN,
@@ -17,7 +19,7 @@ typedef enum {
 	MENU_END
 }Menu;
 
-void initMenu(void);
+void initMenu(Lcd_PortType port[], Lcd_PinType pin[]);
 void incrementMenu(void);
 void decrementMenu(void);
 void toggleMenuEdit(void);

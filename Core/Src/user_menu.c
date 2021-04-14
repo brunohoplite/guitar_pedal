@@ -6,9 +6,9 @@
  */
 #include <stdbool.h>
 #include "user_menu.h"
-#include "lcd.h"
 #include "distortion.h"
 #include "delay.h"
+#include "clean.h"
 
 #define MENU2_SETTING_STRING_OFFSET	10
 #define MENU2_edit_STRING_OFFSET	0
@@ -16,15 +16,9 @@
 #define INCREMENT	true
 #define DECREMENT	false
 
-Lcd_PortType ports[] = {
-		LCD_D4_GPIO_Port, LCD_D5_GPIO_Port, LCD_D6_GPIO_Port, LCD_D7_GPIO_Port
-};
-
-Lcd_PinType pins[] = {LCD_D4_Pin, LCD_D5_Pin, LCD_D6_Pin, LCD_D7_Pin};
-
-char menuClean[16] = "Clean";
+char menuClean1[16] = "Clean", menuClean2[16] = "   Level: 1";
 char menuDelay1[16] = "Delay", menuDelay2[16] = "   Level: 1";
-char menuDistortion1[16] = "Distortion", menuDistortion2[16] = "   Level: 1";
+char menuDistortion1[16] = "Distortion", menuDistortion2[16] = "   Gain:  1";
 char blank[16] = "                ";
 
 typedef enum {
@@ -53,15 +47,17 @@ static void updateMenuScroll(void)
 	switch(userMenu.currentMenu) {
 
 	case  MENU_CLEAN:
-		userMenu.menu1 = menuClean;
-		userMenu.menu2 = blank;
+		userMenu.menu1 = menuClean1;
+		userMenu.menu2 = menuClean2;
+		unsigned cleanLevel = (unsigned)getCleanLevelValue();
+		insertSettingInMenu(cleanLevel);
 		break;
 
 	case  MENU_DELAY:
 		userMenu.menu1 = menuDelay1;
 		userMenu.menu2 = menuDelay2;
-		unsigned level = (unsigned)getDelayLevelValue();
-		insertSettingInMenu(level);
+		unsigned delayLevel = (unsigned)getDelayLevelValue();
+		insertSettingInMenu(delayLevel);
 		break;
 
 	case  MENU_DISTORTION:
@@ -84,7 +80,11 @@ static void modifySetting(bool increment, unsigned* setting)
 	if(increment)
 		*setting += 1;
 	else
+	{
+		if(*setting <= 0)
+			return;
 		*setting -= 1;
+	}
 }
 
 static bool updateMenuEdit(bool increment)
@@ -95,6 +95,7 @@ static bool updateMenuEdit(bool increment)
 	switch(userMenu.currentMenu) {
 
 	case  MENU_CLEAN:
+		setting = (unsigned*)getCleanLevel();
 		break;
 
 	case  MENU_DELAY:
@@ -199,11 +200,11 @@ Menu getCurrentMenu(void)
 {
 	return userMenu.currentMenu;
 }
-void initMenu(void)
+void initMenu(Lcd_PortType port[], Lcd_PinType pin[])
 {
 	userMenu.currentMenu = MENU_CLEAN;
 	updateMenuScroll();
-	userMenu.lcd = Lcd_create(ports, pins, LCD_RS_GPIO_Port, LCD_RS_Pin, LCD_E_GPIO_Port, LCD_E_Pin, LCD_4_BIT_MODE);
+	userMenu.lcd = Lcd_create(port, pin, LCD_RS_GPIO_Port, LCD_RS_Pin, LCD_E_GPIO_Port, LCD_E_Pin, LCD_4_BIT_MODE);
 	Lcd_string(&userMenu.lcd, "STM32 Effects!");
 	HAL_Delay(1000);
 	displayMenu(BOTH_MENUS);

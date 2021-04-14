@@ -57,7 +57,19 @@ TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim6;
 
 /* USER CODE BEGIN PV */
+Lcd_PortType ports[] = {
+		LCD_D4_GPIO_Port,
+		LCD_D5_GPIO_Port,
+		LCD_D6_GPIO_Port,
+		LCD_D7_GPIO_Port
+};
 
+Lcd_PinType pins[] = {
+		LCD_D4_Pin,
+		LCD_D5_Pin,
+		LCD_D6_Pin,
+		LCD_D7_Pin
+};
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -90,6 +102,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 
 static void setInitialState(void)
 {
+	initMenu(ports, pins);
 	rotaryEncoderInit(ROTARY_A_GPIO_Port, ROTARY_A_Pin, ROTARY_B_GPIO_Port, ROTARY_B_Pin, ROTARY_SW_GPIO_Port, ROTARY_SW_Pin, incrementMenu, decrementMenu, toggleMenuEdit);
 
 	HAL_ADC_Start_IT(&hadc1);
@@ -133,7 +146,6 @@ int main(void)
   MX_TIM2_Init();
   MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
-  initMenu();
   setInitialState();
   /* USER CODE END 2 */
  
