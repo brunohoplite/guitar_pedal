@@ -8,7 +8,7 @@
 #ifndef INC_ROTARY_ENCODER_H_
 #define INC_ROTARY_ENCODER_H_
 
-#include "stm32f4xx_hal.h"
+#include "main.h"
 #include <stdbool.h>
 
 #define RotaryGpioPort GPIO_TypeDef*
@@ -26,15 +26,17 @@ typedef struct {
 	signed count;
 	void(*onIncrement)(void);
 	void(*onDecrement)(void);
-	bool isDebounce;
+	void(*onSwPressed)(void);
 	struct {
+		bool isDebounce;
 		uint32_t startTicks;
 		RotaryPinState pinState;
-	}debounce;
+	}debounce[2];
 }RotaryEncoderCtx;
 
-void rotaryEncoderInit(RotaryGpioPort portA, RotaryGpioPin pinA, RotaryGpioPort portB, RotaryGpioPin pinB, RotaryGpioPort portSw, RotaryGpioPin pinSw, void (*incrementHandler)(void), void (*decrementHandler)(void));
-void rotartEncoderIsr(void);
+void rotaryEncoderInit(RotaryGpioPort portA, RotaryGpioPin pinA, RotaryGpioPort portB, RotaryGpioPin pinB, RotaryGpioPort portSw, RotaryGpioPin pinSw, void (*incrementHandler)(void), void (*decrementHandler)(void), void (*swPressedHandler)(void));
+void rotaryEncoderIsr(void);
+void swEncoderIsr(void);
 void rotaryEncoderTask(void);
 
 #endif /* INC_ROTARY_ENCODER_H_ */

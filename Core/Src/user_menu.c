@@ -87,9 +87,10 @@ static void modifySetting(bool increment, unsigned* setting)
 		*setting -= 1;
 }
 
-static void updateMenuEdit(bool increment)
+static bool updateMenuEdit(bool increment)
 {
-	unsigned* setting;
+	unsigned* setting = NULL;
+	bool success = false;
 
 	switch(userMenu.currentMenu) {
 
@@ -110,8 +111,14 @@ static void updateMenuEdit(bool increment)
 	default:
 		break;
 	}
-	modifySetting(increment, setting);
-	insertSettingInMenu(*setting);
+	if(setting != NULL)
+	{
+		modifySetting(increment, setting);
+		insertSettingInMenu(*setting);
+		success = true;
+	}
+
+	return success;
 }
 
 static void displayMenu(MenuRow row)
@@ -138,13 +145,17 @@ static void displayMenu(MenuRow row)
 	}
 }
 
+static void processEditMenu(bool increment)
+{
+	bool success = updateMenuEdit(increment);
+	if(success)
+		displayMenu(MENU2);
+}
+
 void incrementMenu(void)
 {
 	if(userMenu.isEdit)
-	{
-		updateMenuEdit(INCREMENT);
-		displayMenu(MENU2);
-	}
+		processEditMenu(INCREMENT);
 	else
 	{
 		userMenu.currentMenu++;
@@ -158,10 +169,7 @@ void incrementMenu(void)
 void decrementMenu(void)
 {
 	if(userMenu.isEdit)
-	{
-		updateMenuEdit(DECREMENT);
-		displayMenu(MENU2);
-	}
+		processEditMenu(DECREMENT);
 	else
 	{
 		userMenu.currentMenu--;

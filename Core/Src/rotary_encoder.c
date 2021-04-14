@@ -7,7 +7,13 @@
 #include "rotary_encoder.h"
 #include <stdbool.h>
 
-#define DEBOUNCE_TIME 3 // ms
+#define ROTARY_DEBOUNCE_TIME 3  // ms
+#define SW_DEBOUNCE_TIME 	 75 // ms
+
+enum {
+	DEBOUCNE_ROTARY = 0,
+	DEBOUNCE_SW = 1
+}Debounce;
 
 typedef enum {
 	ROTARY_PIN_A,
@@ -17,7 +23,7 @@ typedef enum {
 RotaryEncoderCtx rotaryEncoder;
 
 void rotaryEncoderInit(RotaryGpioPort portA, RotaryGpioPin pinA, RotaryGpioPort portB, RotaryGpioPin pinB, RotaryGpioPort portSw, RotaryGpioPin pinSw,
-						void (*incrementHandler)(void), void (*decrementHandler)(void))
+						void (*incrementHandler)(void), void (*decrementHandler)(void), void (*swPressedHandler)(void))
 {
 	rotaryEncoder.aPort = portA;
 	rotaryEncoder.aPin = pinA;
@@ -27,24 +33,34 @@ void rotaryEncoderInit(RotaryGpioPort portA, RotaryGpioPin pinA, RotaryGpioPort 
 	rotaryEncoder.swPin = pinSw;
 	rotaryEncoder.onIncrement = incrementHandler;
 	rotaryEncoder.onDecrement = decrementHandler;
+	rotaryEncoder.onSwPressed = swPressedHandler;
 }
 
-void rotartEncoderIsr(void)
+void rotaryEncoderIsr(void)
 {
-	if((HAL_GPIO_ReadPin(rotaryEncoder.aPort, rotaryEncoder.aPin) == GPIO_PIN_RESET) && !rotaryEncoder.isDebounce)
+	if((HAL_GPIO_ReadPin(rotaryEncoder.aPort, rotaryEncoder.aPin) == GPIO_PIN_RESET) && !rotaryEncoder.debounce[DEBOUCNE_ROTARY].isDebounce)
 	{
-		rotaryEncoder.isDebounce = true;
-		rotaryEncoder.debounce.startTicks = HAL_GetTick();
+		rotaryEncoder.debounce[DEBOUCNE_ROTARY].isDebounce = true;
+		rotaryEncoder.debounce[DEBOUCNE_ROTARY].startTicks = HAL_GetTick();
+	}
+}
+
+void swEncoderIsr(void)
+{
+	if(!rotaryEncoder.debounce[DEBOUNCE_SW].isDebounce)
+	{
+		rotaryEncoder.debounce[DEBOUNCE_SW].isDebounce = true;
+		rotaryEncoder.debounce[DEBOUNCE_SW].startTicks = HAL_GetTick();
 	}
 }
 
 void rotaryEncoderTask(void)
 {
-	if(rotaryEncoder.isDebounce)
+	if(rotaryEncoder.debounce[DEBOUCNE_ROTARY].isDebounce)
 	{
-		if((HAL_GetTick() - rotaryEncoder.debounce.startTicks) >= DEBOUNCE_TIME)
+		if((HAL_GetTick() - rotaryEncoder.debounce[DEBOUCNE_ROTARY].startTicks) >= ROTARY_DEBOUNCE_TIME)
 		{
-			rotaryEncoder.isDebounce = false;
+			rotaryEncoder.debounce[DEBOUCNE_ROTARY].isDebounce = false;
 			RotaryPinState currentA = HAL_GPIO_ReadPin(rotaryEncoder.aPort, rotaryEncoder.aPin);
 			RotaryPinState currentB = HAL_GPIO_ReadPin(rotaryEncoder.bPort, rotaryEncoder.bPin);
 
@@ -63,6 +79,16 @@ void rotaryEncoderTask(void)
 					rotaryEncoder.onDecrement();
 				rotaryEncoder.count--;
 			}
+		}
+	}
+
+	if(rotaryEncoder.debounce[DEBOUNCE_SW].isDebounce)
+	{
+		if((HAL_GetTick() - rotaryEncoder.debounce[DEBOUNCE_SW].startTicks) >= SW_DEBOUNCE_TIME && HAL_GPIO_ReadPin(rotaryEncoder.swPort, rotaryEncoder.swPin) == GPIO_PIN_RESET)
+		{
+			rotaryEncoder.debounce[DEBOUNCE_SW].isDebounce = false;
+			rotaryEncoder.onSwPressed();
+			HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
 		}
 	}
 }
