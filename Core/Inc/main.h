@@ -62,8 +62,6 @@ void Error_Handler(void);
 #define BATTERY_LEVEL_GPIO_Port GPIOC
 #define GUITAR_IN_Pin GPIO_PIN_0
 #define GUITAR_IN_GPIO_Port GPIOA
-#define test_Pin GPIO_PIN_1
-#define test_GPIO_Port GPIOA
 #define PEDAL_OUT_Pin GPIO_PIN_4
 #define PEDAL_OUT_GPIO_Port GPIOA
 #define LED_Pin GPIO_PIN_0
