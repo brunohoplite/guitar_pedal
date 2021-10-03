@@ -93,10 +93,10 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
   /* USER CODE END ADC1_MspInit 0 */
     /* Peripheral clock enable */
     __HAL_RCC_ADC1_CLK_ENABLE();
-  
+
     __HAL_RCC_GPIOA_CLK_ENABLE();
-    /**ADC1 GPIO Configuration    
-    PA0-WKUP     ------> ADC1_IN0 
+    /**ADC1 GPIO Configuration
+    PA0-WKUP     ------> ADC1_IN0
     */
     GPIO_InitStruct.Pin = GUITAR_IN_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
@@ -117,10 +117,10 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
   /* USER CODE END ADC2_MspInit 0 */
     /* Peripheral clock enable */
     __HAL_RCC_ADC2_CLK_ENABLE();
-  
+
     __HAL_RCC_GPIOC_CLK_ENABLE();
-    /**ADC2 GPIO Configuration    
-    PC0     ------> ADC2_IN10 
+    /**ADC2 GPIO Configuration
+    PC0     ------> ADC2_IN10
     */
     GPIO_InitStruct.Pin = BATTERY_LEVEL_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
@@ -152,9 +152,9 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
   /* USER CODE END ADC1_MspDeInit 0 */
     /* Peripheral clock disable */
     __HAL_RCC_ADC1_CLK_DISABLE();
-  
-    /**ADC1 GPIO Configuration    
-    PA0-WKUP     ------> ADC1_IN0 
+
+    /**ADC1 GPIO Configuration
+    PA0-WKUP     ------> ADC1_IN0
     */
     HAL_GPIO_DeInit(GUITAR_IN_GPIO_Port, GUITAR_IN_Pin);
 
@@ -178,9 +178,9 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
   /* USER CODE END ADC2_MspDeInit 0 */
     /* Peripheral clock disable */
     __HAL_RCC_ADC2_CLK_DISABLE();
-  
-    /**ADC2 GPIO Configuration    
-    PC0     ------> ADC2_IN10 
+
+    /**ADC2 GPIO Configuration
+    PC0     ------> ADC2_IN10
     */
     HAL_GPIO_DeInit(BATTERY_LEVEL_GPIO_Port, BATTERY_LEVEL_Pin);
 
@@ -216,10 +216,10 @@ void HAL_DAC_MspInit(DAC_HandleTypeDef* hdac)
   /* USER CODE END DAC_MspInit 0 */
     /* Peripheral clock enable */
     __HAL_RCC_DAC_CLK_ENABLE();
-  
+
     __HAL_RCC_GPIOA_CLK_ENABLE();
-    /**DAC GPIO Configuration    
-    PA4     ------> DAC_OUT1 
+    /**DAC GPIO Configuration
+    PA4     ------> DAC_OUT1
     */
     GPIO_InitStruct.Pin = PEDAL_OUT_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
@@ -248,9 +248,9 @@ void HAL_DAC_MspDeInit(DAC_HandleTypeDef* hdac)
   /* USER CODE END DAC_MspDeInit 0 */
     /* Peripheral clock disable */
     __HAL_RCC_DAC_CLK_DISABLE();
-  
-    /**DAC GPIO Configuration    
-    PA4     ------> DAC_OUT1 
+
+    /**DAC GPIO Configuration
+    PA4     ------> DAC_OUT1
     */
     HAL_GPIO_DeInit(PEDAL_OUT_GPIO_Port, PEDAL_OUT_Pin);
 

@@ -19,6 +19,7 @@
 char menuClean1[16] = "Clean", menuClean2[16] = "   Level: 1";
 char menuDelay1[16] = "Delay", menuDelay2[16] = "   Level: 1";
 char menuDistortion1[16] = "Distortion", menuDistortion2[16] = "   Gain:  1";
+char menuTuner1[16] = "Tuner", menuTuner2[16] = "   E";
 char blank[16] = "                ";
 
 typedef enum {
@@ -66,6 +67,10 @@ static void updateMenuScroll(void)
 		unsigned gain = getDistortionGainValue();
 		insertSettingInMenu(gain);
 		break;
+
+	case MENU_TUNER:
+		userMenu.menu1 = menuTuner1;
+		userMenu.menu2 = menuTuner2;
 
 	case MENU_START:
 	case MENU_END:
@@ -161,7 +166,7 @@ void incrementMenu(void)
 	{
 		userMenu.currentMenu++;
 		if(userMenu.currentMenu >= MENU_END)
-			userMenu.currentMenu = MENU_CLEAN;
+			userMenu.currentMenu = MENU_START + 1;
 		updateMenuScroll();
 		displayMenu(BOTH_MENUS);
 	}
@@ -175,7 +180,7 @@ void decrementMenu(void)
 	{
 		userMenu.currentMenu--;
 		if(userMenu.currentMenu <= MENU_START)
-			userMenu.currentMenu = MENU_DISTORTION;
+			userMenu.currentMenu = MENU_END - 1;
 		updateMenuScroll();
 		displayMenu(BOTH_MENUS);
 	}

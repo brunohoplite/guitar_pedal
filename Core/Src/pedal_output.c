@@ -67,6 +67,9 @@ static void processSelectedEffect(void)
 		pedal.out = distortion(pedal.guitarSignal, pedal.filteredValue);
 		break;
 
+	case MENU_TUNER:
+		pedal.out = 0;
+
 	case MENU_START:
 	case MENU_END:
 	default:
