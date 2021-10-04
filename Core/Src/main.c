@@ -28,6 +28,7 @@
 #include <stdbool.h>
 #include "user_menu.h"
 #include "pedal_output.h"
+#include "tuner.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -100,6 +101,7 @@ static void setInitialState(void)
 {
 	initMenu(ports, pins);
 	rotaryEncoderInit(ROTARY_A_GPIO_Port, ROTARY_A_Pin, ROTARY_B_GPIO_Port, ROTARY_B_Pin, ROTARY_SW_GPIO_Port, ROTARY_SW_Pin, incrementMenu, decrementMenu, toggleMenuEdit);
+	tunerInit();
 
 	HAL_ADC_Start_IT(&hadc1);
 	HAL_TIM_Base_Start(&htim2);

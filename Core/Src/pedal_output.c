@@ -11,17 +11,18 @@
 #include "delay.h"
 #include "distortion.h"
 #include "clean.h"
+#include "tuner.h"
 
 #define RMS_SAMPLES		100
 
 const float alpha = 0.001f;
 
 typedef struct {
-	uint32_t guitarSignal;
-	uint32_t out;
+	float guitarSignal;	// Guitar output + DC offset
+	uint32_t out;	// Output to be written on DAC
 	unsigned count;
 	float lastFilteredValue;
-	float filteredValue;
+	float filteredValue; // DC offset
 	float actual;
 	float squared;
 	float rms;
@@ -69,6 +70,7 @@ static void processSelectedEffect(void)
 
 	case MENU_TUNER:
 		pedal.out = 0;
+		tuner((float)pedal.guitarSignal - pedal.filteredValue);
 
 	case MENU_START:
 	case MENU_END:
