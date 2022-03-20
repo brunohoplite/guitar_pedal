@@ -18,3 +18,7 @@ To get started with the code, download the stm32cubeIDE from ST, import the proj
 ## Usage
 The pedal comes with 16 by 2 LCD display that lets the user choose and modify each effect using a rotary encoder.
 The pedal can be powered via USB or a 9V battery. The schematics of the PCB are in the datasheet.
+
+## Assembled PCB
+![Alt text](HW/guitar_pedal_1.jpg?raw=true)
+![Alt text](HW/guitar_pedal_2.jpg?raw=true)
