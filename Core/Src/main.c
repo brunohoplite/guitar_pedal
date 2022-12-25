@@ -88,7 +88,6 @@ static void setInitialState(void)
     rotaryEncoderInit(ROTARY_A_GPIO_Port, ROTARY_A_Pin, ROTARY_B_GPIO_Port, ROTARY_B_Pin, ROTARY_SW_GPIO_Port, ROTARY_SW_Pin, incrementMenu, decrementMenu, toggleMenuEdit);
     pedalHalInit(&hadc1, &hdac);
 	HAL_TIM_Base_Start(&htim2);
-    HAL_DAC_Start(&hdac, DAC_CHANNEL_1);
 }
 /* USER CODE END 0 */
 

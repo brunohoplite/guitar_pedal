@@ -44,6 +44,7 @@ void pedalHalProcessData(void)
         {
             pedalOutputTask(&ctx.in[i], &ctx.out[i]);
         }
+        HAL_DAC_Start_DMA(ctx.dac, DAC_CHANNEL_1, &ctx.out[0], (DOUBLE_BUFFER_SIZE / 2), DAC_ALIGN_12B_R);
         ctx.isDataReady = false;
     }
 }
