@@ -20,5 +20,6 @@
 #define DOUBLE_BUFFER_SIZE 1024
 
 void pedalHalInit(ADC_HandleTypeDef* adc, DAC_HandleTypeDef* dac);
+void pedalHalTask(void);
 
 #endif /* HAL_PEDAL_HAL_H_ */

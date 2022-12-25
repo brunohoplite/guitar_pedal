@@ -29,14 +29,7 @@ static void pedalHalStartAdcDma(void)
     HAL_ADC_Start_DMA(ctx.adc, &inputBuffer[0], DOUBLE_BUFFER_SIZE);
 }
 
-void pedalHalInit(ADC_HandleTypeDef* adc, DAC_HandleTypeDef* dac)
-{
-    ctx.adc = adc;
-    ctx.dac = dac;
-    pedalHalStartAdcDma();
-}
-
-void pedalHalProcessData(void)
+static void pedalHalProcessData(void)
 {
     if (ctx.isDataReady)
     {
@@ -47,6 +40,18 @@ void pedalHalProcessData(void)
         HAL_DAC_Start_DMA(ctx.dac, DAC_CHANNEL_1, &ctx.out[0], (DOUBLE_BUFFER_SIZE / 2), DAC_ALIGN_12B_R);
         ctx.isDataReady = false;
     }
+}
+
+void pedalHalInit(ADC_HandleTypeDef* adc, DAC_HandleTypeDef* dac)
+{
+    ctx.adc = adc;
+    ctx.dac = dac;
+    pedalHalStartAdcDma();
+}
+
+void pedalHalTask(void)
+{
+    pedalHalProcessData();
 }
 
 /**************************************************** ST HAL Callbacks ***************************************************************/

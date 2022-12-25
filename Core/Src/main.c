@@ -132,6 +132,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+      pedalHalTask();
 	  rotaryEncoderTask();
     /* USER CODE END WHILE */
 
