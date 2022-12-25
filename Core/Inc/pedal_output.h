@@ -10,6 +10,8 @@
 
 #include "main.h"
 
-void pedalOutputTask(ADC_HandleTypeDef* hadc, DAC_HandleTypeDef* hdac);
+#include <stdint.h>
+
+void pedalOutputTask(uint32_t* in, uint32_t* out);
 
 #endif /* INC_PEDAL_OUTPUT_H_ */

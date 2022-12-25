@@ -22,12 +22,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "lcd.h"
-#include "rotary_encoder.h"
-#include <math.h>
-#include <stdbool.h>
-#include "user_menu.h"
-#include "pedal_output.h"
+#include "pedal_hal.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -81,28 +76,15 @@ static void MX_DAC_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
-{
-	if(hadc == &hadc1)
-		pedalOutputTask(hadc, &hdac);
-}
 
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
-	if(GPIO_Pin == ROTARY_SW_Pin)
-		swEncoderIsr();
-	else if(GPIO_Pin == ROTARY_A_Pin)
-		rotaryEncoderIsr();
-}
 
 static void setInitialState(void)
 {
-	initMenu(ports, pins);
-	rotaryEncoderInit(ROTARY_A_GPIO_Port, ROTARY_A_Pin, ROTARY_B_GPIO_Port, ROTARY_B_Pin, ROTARY_SW_GPIO_Port, ROTARY_SW_Pin, incrementMenu, decrementMenu, toggleMenuEdit);
-
-	HAL_ADC_Start_IT(&hadc1);
-	// HAL_TIM_Base_Start(&htim2); TODO: remove
-	HAL_DAC_Start(&hdac, DAC_CHANNEL_1);
+    initMenu(ports, pins);
+    rotaryEncoderInit(ROTARY_A_GPIO_Port, ROTARY_A_Pin, ROTARY_B_GPIO_Port, ROTARY_B_Pin, ROTARY_SW_GPIO_Port, ROTARY_SW_Pin, incrementMenu, decrementMenu, toggleMenuEdit);
+    pedalHalInit(&hadc1, &hdac);
+	  // HAL_TIM_Base_Start(&htim2); TODO: remove
+    HAL_DAC_Start(&hdac, DAC_CHANNEL_1);
 }
 /* USER CODE END 0 */
 

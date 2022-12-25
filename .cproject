@@ -90,6 +90,8 @@
                                     <listOptionValue builtIn="false" value="../Core/Inc"/>
                                     									
                                     <listOptionValue builtIn="false" value="../Drivers/CMSIS/Include"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="../Core/hal"/>
                                     								
                                 </option>
                                 								
