@@ -17,7 +17,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#define DOUBLE_BUFFER_SIZE 1024
+#define DOUBLE_BUFFER_SIZE 32
 
 void pedalHalInit(ADC_HandleTypeDef* adc, DAC_HandleTypeDef* dac);
 void pedalHalTask(void);
