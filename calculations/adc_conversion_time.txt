@@ -1,0 +1,6 @@
+44,100 kHz --> 22.68 us conversion time
+
+PCLK2 @ 84 MHz, divided by 4
+Channel sampling time == 480 cycles
+conversion time == 492 cycles == 23.43 us
+

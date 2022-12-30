@@ -92,12 +92,12 @@ static void noiseGate(void)
 		return;
 #endif
 }
-void pedalOutputTask(ADC_HandleTypeDef* hadc, DAC_HandleTypeDef* hdac)
+void pedalOutputTask(uint32_t* in, uint32_t* out)
 {
-	pedal.guitarSignal = HAL_ADC_GetValue(hadc);
+	pedal.guitarSignal = *in;
 	lowPassFilter();
 	calcultateRms();
 	noiseGate();
 	processSelectedEffect();
-	HAL_DAC_SetValue(hdac, DAC_CHANNEL_1, DAC_ALIGN_12B_R, pedal.out);
+	*out = pedal.out;
 }

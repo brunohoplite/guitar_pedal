@@ -22,12 +22,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "lcd.h"
-#include "rotary_encoder.h"
-#include <math.h>
-#include <stdbool.h>
-#include "user_menu.h"
-#include "pedal_output.h"
+#include "pedal_hal.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -48,8 +43,10 @@
 /* Private variables ---------------------------------------------------------*/
 ADC_HandleTypeDef hadc1;
 ADC_HandleTypeDef hadc2;
+DMA_HandleTypeDef hdma_adc1;
 
 DAC_HandleTypeDef hdac;
+DMA_HandleTypeDef hdma_dac1;
 
 TIM_HandleTypeDef htim2;
 
@@ -72,6 +69,7 @@ Lcd_PinType pins[] = {
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_DMA_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_ADC2_Init(void);
 static void MX_DAC_Init(void);
@@ -82,28 +80,14 @@ static void MX_TIM2_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
-{
-	if(hadc == &hadc1)
-		pedalOutputTask(hadc, &hdac);
-}
 
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
-	if(GPIO_Pin == ROTARY_SW_Pin)
-		swEncoderIsr();
-	else if(GPIO_Pin == ROTARY_A_Pin)
-		rotaryEncoderIsr();
-}
 
 static void setInitialState(void)
 {
-	initMenu(ports, pins);
-	rotaryEncoderInit(ROTARY_A_GPIO_Port, ROTARY_A_Pin, ROTARY_B_GPIO_Port, ROTARY_B_Pin, ROTARY_SW_GPIO_Port, ROTARY_SW_Pin, incrementMenu, decrementMenu, toggleMenuEdit);
-
-	HAL_ADC_Start_IT(&hadc1);
+    initMenu(ports, pins);
+    rotaryEncoderInit(ROTARY_A_GPIO_Port, ROTARY_A_Pin, ROTARY_B_GPIO_Port, ROTARY_B_Pin, ROTARY_SW_GPIO_Port, ROTARY_SW_Pin, incrementMenu, decrementMenu, toggleMenuEdit);
+    pedalHalInit(&hadc1, &hdac);
 	HAL_TIM_Base_Start(&htim2);
-	HAL_DAC_Start(&hdac, DAC_CHANNEL_1);
 }
 /* USER CODE END 0 */
 
@@ -135,6 +119,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_ADC1_Init();
   MX_ADC2_Init();
   MX_DAC_Init();
@@ -147,6 +132,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+      pedalHalTask();
 	  rotaryEncoderTask();
     /* USER CODE END WHILE */
 
@@ -227,7 +213,7 @@ static void MX_ADC1_Init(void)
   hadc1.Init.ExternalTrigConv = ADC_EXTERNALTRIGCONV_T2_TRGO;
   hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
   hadc1.Init.NbrOfConversion = 1;
-  hadc1.Init.DMAContinuousRequests = DISABLE;
+  hadc1.Init.DMAContinuousRequests = ENABLE;
   hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
   if (HAL_ADC_Init(&hadc1) != HAL_OK)
   {
@@ -324,7 +310,7 @@ static void MX_DAC_Init(void)
   }
   /** DAC channel OUT1 config
   */
-  sConfig.DAC_Trigger = DAC_TRIGGER_NONE;
+  sConfig.DAC_Trigger = DAC_TRIGGER_T2_TRGO;
   sConfig.DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE;
   if (HAL_DAC_ConfigChannel(&hdac, &sConfig, DAC_CHANNEL_1) != HAL_OK)
   {
@@ -355,9 +341,9 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
-  htim2.Init.Prescaler = 0;
+  htim2.Init.Prescaler = 3;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 1904;
+  htim2.Init.Period = 490;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
@@ -378,6 +364,26 @@ static void MX_TIM2_Init(void)
   /* USER CODE BEGIN TIM2_Init 2 */
 
   /* USER CODE END TIM2_Init 2 */
+
+}
+
+/**
+  * Enable DMA controller clock
+  */
+static void MX_DMA_Init(void)
+{
+
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA2_CLK_ENABLE();
+  __HAL_RCC_DMA1_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA1_Stream5_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Stream5_IRQn, 1, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Stream5_IRQn);
+  /* DMA2_Stream0_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA2_Stream0_IRQn, 1, 0);
+  HAL_NVIC_EnableIRQ(DMA2_Stream0_IRQn);
 
 }
 
