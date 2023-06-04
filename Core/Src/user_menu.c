@@ -67,10 +67,11 @@ static void updateMenuScroll(void)
 		unsigned gain = getDistortionGainValue();
 		insertSettingInMenu(gain);
 		break;
-
+#ifdef FEATURE_TUNER
 	case MENU_TUNER:
 		userMenu.menu1 = menuTuner1;
 		userMenu.menu2 = menuTuner2;
+#endif
 
 	case MENU_START:
 	case MENU_END:

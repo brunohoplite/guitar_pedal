@@ -15,7 +15,9 @@ typedef enum {
 	MENU_CLEAN = 1,
 	MENU_DELAY = 2,
 	MENU_DISTORTION = 3,
+#ifdef FEATURE_TUNER
 	MENU_TUNER = 4,
+#endif
 
 	MENU_END
 }Menu;
